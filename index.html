@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Helping People in Our Community</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body { font-family: 'Be Vietnam Pro', sans-serif; background: #1F2A30; color: #2F3E46; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: none; flex-direction: column; justify-content: center;
+    padding: 48px 72px 110px;
+    background: #F7F4EE;
+    overflow-y: auto;
+  }
+  .slide.active { display: flex; animation: fade .5s ease; }
+  @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+  .slide.dark { background: #2F3E46; color: #F7F4EE; }
+
+  .num { position: absolute; top: 24px; right: 36px; font-size: 18px; font-weight: 700; opacity: .5; }
+
+  h1 { font-size: clamp(38px, 5vw, 72px); font-weight: 800; line-height: 1.1; margin-bottom: 18px; }
+  h2 { font-size: clamp(30px, 4vw, 56px); font-weight: 700; line-height: 1.15; margin-bottom: 26px; }
+  p, li { font-size: clamp(18px, 2vw, 26px); line-height: 1.6; }
+  p { margin-bottom: 14px; }
+  ul { padding-left: 28px; }
+  li { margin-bottom: 12px; }
+  .accent { color: #C8553D; font-weight: 700; }
+  .sub { font-size: clamp(18px, 2.2vw, 28px); opacity: .9; }
+
+  .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; margin-top: 24px; }
+  .gallery img {
+    width: 100%; height: clamp(180px, 36vh, 360px);
+    object-fit: cover; border-radius: 18px;
+    box-shadow: 0 12px 30px rgba(0,0,0,.18);
+  }
+
+  video { width: 100%; max-height: 70vh; border-radius: 18px; background: #000; box-shadow: 0 12px 30px rgba(0,0,0,.25); }
+
+  /* Quiz */
+  .quiz-q { background: #FFFFFF; border-radius: 18px; padding: 22px 26px; margin-bottom: 18px; box-shadow: 0 6px 18px rgba(0,0,0,.08); }
+  .quiz-q h3 { font-size: clamp(20px, 2.2vw, 28px); font-weight: 700; margin-bottom: 14px; color: #2F3E46; }
+  .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .quiz-opts button {
+    font-family: inherit; font-size: clamp(16px, 1.7vw, 20px); text-align: left;
+    padding: 14px 18px; border-radius: 12px; border: 2px solid #CFD8D3;
+    background: #F7F4EE; color: #2F3E46; cursor: pointer; transition: all .2s;
+  }
+  .quiz-opts button:hover:not(:disabled) { border-color: #84A98C; background: #EEF5F0; }
+  .quiz-opts button.correct { background: #DDF0E2; border-color: #4E9A6A; font-weight: 700; }
+  .quiz-opts button.wrong { background: #F9E1DB; border-color: #C8553D; }
+  .quiz-opts button:disabled { cursor: default; }
+  .score { font-size: clamp(22px, 2.6vw, 34px); font-weight: 700; color: #C8553D; margin-top: 8px; min-height: 40px; }
+
+  /* Navigation */
+  .nav { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 16px; z-index: 10; }
+  .nav button {
+    font-family: inherit; font-size: 18px; font-weight: 700;
+    padding: 10px 22px; border-radius: 999px; border: none;
+    background: #84A98C; color: #FFFFFF; cursor: pointer;
+  }
+  .nav button:disabled { opacity: .35; cursor: default; }
+  .counter { color: #FFFFFF; font-weight: 600; min-width: 60px; text-align: center; }
+
+  @media (max-width: 700px) {
+    .slide { padding: 40px 22px 110px; }
+    .gallery, .quiz-opts { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Slide 1 -->
+<section class="slide dark active">
+  <span class="num">1</span>
+  <h1>Helping People<br>in Our Community</h1>
+  <p class="sub">Volunteer activities, including support for nursing homes</p>
+  <div class="gallery">
+    <img src="1.jfif" alt="Volunteers smiling together">
+    <img src="2.jfif" alt="Older adults chatting in a lounge">
+  </div>
+</section>
+
+<!-- Slide 2 -->
+<section class="slide">
+  <span class="num">2</span>
+  <h2>What is volunteering?</h2>
+  <p>Volunteering means giving time and effort to help others without expecting money in return. Small acts of help can make a big difference in a community.</p>
+  <div class="gallery">
+    <img src="3.jfif" alt="Volunteer playing a game with residents">
+    <img src="4.jfif" alt="Young woman talking with an older woman">
+  </div>
+</section>
+
+<!-- Slide 3 -->
+<section class="slide">
+  <span class="num">3</span>
+  <h2>Ways to help people</h2>
+  <ul>
+    <li>Visiting and keeping company with lonely people</li>
+    <li>Tutoring children or helping them with homework</li>
+    <li>Donating food, clothes, or books to those in need</li>
+    <li>Cleaning up parks, streets, and public places</li>
+  </ul>
+  <div class="gallery">
+    <img src="5.jfif" alt="Volunteers playing Ludo with residents">
+    <img src="6.jfif" alt="Students and residents gardening">
+  </div>
+</section>
+
+<!-- Slide 4 -->
+<section class="slide">
+  <span class="num">4</span>
+  <h2>Volunteering at a nursing home</h2>
+  <p>A nursing home is where older people live and receive daily care. Volunteers can:</p>
+  <ul>
+    <li>Chat and listen to stories</li>
+    <li>Play games, read, or sing together</li>
+    <li>Help with light activities like gardening or crafts</li>
+  </ul>
+  <div class="gallery">
+    <img src="7.jfif" alt="Student helping children with a worksheet">
+    <img src="8.jfif" alt="Volunteers cleaning up plastic bottles">
+  </div>
+</section>
+
+<!-- Slide 5 -->
+<section class="slide">
+  <span class="num">5</span>
+  <h2>How to be a good volunteer</h2>
+  <ul>
+    <li>Be polite, patient, and respectful</li>
+    <li>Ask staff what you are allowed to do</li>
+    <li>Respect each person's privacy and choices</li>
+    <li>Keep your promises and arrive on time</li>
+  </ul>
+  <div class="gallery">
+    <img src="9.jfif" alt="Students planting trees and visiting an elderly couple">
+    <img src="10.jfif" alt="Girl offering food to a man on the street">
+  </div>
+</section>
+
+<!-- Slide 6 -->
+<section class="slide">
+  <span class="num">6</span>
+  <h2>Benefits</h2>
+  <ul>
+    <li><span class="accent">For older people:</span> less loneliness, more joy, and a sense of connection</li>
+    <li><span class="accent">For volunteers:</span> new skills, empathy, and confidence</li>
+    <li><span class="accent">For the community:</span> stronger bonds between generations</li>
+  </ul>
+  <div class="gallery">
+    <img src="11.jfif" alt="Volunteers giving water to an elderly woman">
+    <img src="12.jfif" alt="Students laughing with an elderly woman">
+  </div>
+</section>
+
+<!-- Slide 7 -->
+<section class="slide">
+  <span class="num">7</span>
+  <h2>Video: Volunteers in Action</h2>
+  <video controls preload="metadata" src="video_da_nen_duoi_25mb.mp4"></video>
+</section>
+
+<!-- Slide 8 -->
+<section class="slide">
+  <span class="num">8</span>
+  <h2>Quiz: Test Your Knowledge</h2>
+  <div id="quiz"></div>
+  <p class="score" id="score"></p>
+</section>
+
+<div class="nav">
+  <button id="prev">← Back</button>
+  <span class="counter" id="counter">1 / 8</span>
+  <button id="next">Next →</button>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let current = 0;
+
+  function show(i) {
+    slides.forEach((s, idx) => s.classList.toggle('active', idx === i));
+    slides.forEach((s, idx) => { if (idx !== i) s.querySelectorAll('video').forEach(v => v.pause()); });
+    document.getElementById('counter').textContent = (i + 1) + ' / ' + slides.length;
+    document.getElementById('prev').disabled = i === 0;
+    document.getElementById('next').disabled = i === slides.length - 1;
+    current = i;
+  }
+  function next() { if (current < slides.length - 1) show(current + 1); }
+  function prev() { if (current > 0) show(current - 1); }
+
+  document.getElementById('next').onclick = next;
+  document.getElementById('prev').onclick = prev;
+  document.addEventListener('keydown', e => {
+    if (e.target.tagName === 'VIDEO') return;
+    if (e.key === 'ArrowRight') next();
+    if (e.key === 'ArrowLeft') prev();
+  });
+
+  // Quiz
+  const questions = [
+    { q: '1. What is volunteering?',
+      opts: ['Working for money', 'Giving time and effort to help others without expecting money', 'Studying at school', 'Selling goods in a market'],
+      a: 1 },
+    { q: '2. Which activity is a good way to help older people at a nursing home?',
+      opts: ['Playing games and chatting with them', 'Shouting at them', 'Taking photos of them without permission', 'Ignoring them'],
+      a: 0 },
+    { q: '3. What should a good volunteer do first when visiting a nursing home?',
+      opts: ['Change the rules of the facility', 'Ask staff what they are allowed to do', 'Bring pets without asking', 'Leave early without telling anyone'],
+      a: 1 }
+  ];
+
+  const quizEl = document.getElementById('quiz');
+  let score = 0, answered = 0;
+
+  questions.forEach((item, qi) => {
+    const box = document.createElement('div');
+    box.className = 'quiz-q';
+    box.innerHTML = '<h3></h3><div class="quiz-opts"></div>';
+    box.querySelector('h3').textContent = item.q;
+    const grid = box.querySelector('.quiz-opts');
+    item.opts.forEach((text, oi) => {
+      const btn = document.createElement('button');
+      btn.textContent = String.fromCharCode(65 + oi) + '. ' + text;
+      btn.onclick = () => {
+        const buttons = grid.querySelectorAll('button');
+        buttons.forEach(b => b.disabled = true);
+        if (oi === item.a) { btn.classList.add('correct'); score++; }
+        else { btn.classList.add('wrong'); buttons[item.a].classList.add('correct'); }
+        answered++;
+        if (answered === questions.length) {
+          document.getElementById('score').textContent = 'Your score: ' + score + ' / ' + questions.length;
+        }
+      };
+      grid.appendChild(btn);
+    });
+    quizEl.appendChild(box);
+  });
+
+  show(0);
+</script>
+</body>
+</html>
