@@ -23,26 +23,27 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   [hidden] { display: none !important; }
   html, body { height: 100%; overflow: hidden; }
-  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; color: var(--ink); background: var(--navy); }
+  body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; color: var(--ink); background: var(--cream); }
 
   .progress { position: fixed; top: 0; left: 0; height: 5px; background: var(--coral); width: 0; transition: width .4s ease; z-index: 30; }
 
-  /* Cánh hoa nằm dưới nội dung */
+  /* Cánh hoa: nằm trên nền, dưới nội dung */
   .petals { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 1; }
-  .petal { position: absolute; top: -40px; border-radius: 0 100% 0 100%; opacity: .85; animation: fall linear infinite, sway ease-in-out infinite; }
+  .petal { position: absolute; top: -40px; border-radius: 0 100% 0 100%; opacity: .8; animation: fall linear infinite, sway ease-in-out infinite; }
   @keyframes fall { from { top: -40px; } to { top: 110vh; } }
   @keyframes sway {
     0%, 100% { transform: translateX(-30px) rotate(0deg); }
     50% { transform: translateX(30px) rotate(180deg); }
   }
 
+  /* Slide nền trong suốt để thấy cánh hoa phía sau */
   .slide {
     position: absolute; inset: 0;
     display: none;
     grid-template-rows: auto minmax(0, 1fr);
     gap: 28px;
     padding: 60px 80px 120px;
-    background: rgba(250, 247, 242, .9);
+    background: transparent;
     z-index: 2;
   }
   .slide.active { display: grid; animation: rise .5s ease; }
@@ -107,7 +108,7 @@
   .video-body { place-items: center; display: grid; }
   video { max-width: 100%; max-height: 100%; border-radius: 24px; background: #000; box-shadow: 0 18px 40px rgba(30,58,76,.25); }
 
-  /* Slide 8: quiz (nền đặc, cánh hoa bị che, toàn bộ 4 đáp án hiện đủ) */
+  /* Slide 8: quiz (nền đặc để cánh hoa không đè lên câu hỏi) */
   .quiz-slide { background: var(--cream); padding: 36px 72px 40px; gap: 18px; }
   .quiz-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
   .quiz-top .tag { margin-bottom: 0; }
