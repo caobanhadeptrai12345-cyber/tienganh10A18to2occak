@@ -15,8 +15,13 @@
     --muted: #5F7079;
     --white: #FFFFFF;
     --line: #E6E1D8;
+    --ok-bg: #DDF0E2;
+    --ok-text: #2E6B45;
+    --bad-bg: #F9E1DB;
+    --bad-text: #A4442C;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  [hidden] { display: none !important; }
   html, body { height: 100%; overflow: hidden; }
   body { font-family: 'Be Vietnam Pro', system-ui, sans-serif; color: var(--ink); background: var(--navy); }
 
@@ -33,7 +38,6 @@
   .slide.active { display: grid; animation: rise .5s ease; }
   @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 
-  /* Chữ trượt lên khi vào slide */
   .slide.active .tag { animation: reveal .7s ease both; }
   .slide.active h2 { animation: reveal .8s .12s ease both; }
   .slide.active .text > *, .slide.active .text li { animation: reveal .8s .25s ease both; }
@@ -70,7 +74,6 @@
     box-shadow: 0 14px 30px rgba(30,58,76,.16);
     animation: kenburns 18s ease-in-out infinite alternate;
   }
-  /* Ảnh phóng to chậm và trôi nhẹ */
   @keyframes kenburns {
     from { transform: scale(1) translate(0, 0); }
     to { transform: scale(1.08) translate(-1.5%, -1%); }
@@ -95,18 +98,52 @@
   video { max-width: 100%; max-height: 100%; border-radius: 24px; background: #000; box-shadow: 0 18px 40px rgba(30,58,76,.25); }
 
   /* Slide 8: quiz */
-  .quiz { display: grid; gap: 14px; align-content: start; overflow: auto; min-height: 0; }
-  .quiz-q { background: var(--white); border-radius: 18px; padding: 18px 24px; box-shadow: 0 6px 18px rgba(30,58,76,.08); }
-  .quiz-q h3 { margin-bottom: 12px; }
-  .quiz-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .quiz-opts button { font-family: inherit; font-size: 17px; text-align: left; line-height: 1.4; padding: 12px 16px; border-radius: 12px; border: 2px solid var(--line); background: var(--cream); color: var(--ink); cursor: pointer; transition: all .2s; }
-  .quiz-opts button:hover:not(:disabled) { border-color: var(--sage); background: #EEF6F1; }
-  .quiz-opts button.correct { background: #DDF0E2; border-color: #4E9A6A; font-weight: 700; }
-  .quiz-opts button.wrong { background: #F9E1DB; border-color: var(--coral); }
-  .quiz-opts button:disabled { cursor: default; }
-  .score { font-size: 24px; font-weight: 800; color: var(--coral); min-height: 34px; margin-top: 10px; }
+  .quiz-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .quiz-top .tag { margin-bottom: 14px; }
+  .back-slide { font-family: inherit; font-size: 15px; font-weight: 700; padding: 8px 16px; border-radius: 999px; border: 2px solid var(--navy); background: transparent; color: var(--navy); cursor: pointer; margin-bottom: 14px; }
+  .back-slide:hover { background: var(--navy); color: var(--white); }
 
-  /* Pháo giấy khi trả lời đúng */
+  .quiz-body { grid-template-columns: 1.1fr 1fr; gap: 36px; }
+  .q-card { background: var(--white); border-radius: 22px; padding: 28px 30px; display: flex; flex-direction: column; gap: 18px; box-shadow: 0 8px 22px rgba(30,58,76,.08); min-height: 0; overflow: auto; }
+  .q-meta { display: flex; align-items: center; gap: 14px; }
+  .q-label { font-size: 16px; font-weight: 800; color: var(--coral); white-space: nowrap; }
+  .q-bar { flex: 1; height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; }
+  .q-bar div { height: 100%; background: var(--sage); width: 0; transition: width .4s ease; }
+  .q-text { font-size: clamp(22px, 2.2vw, 30px); font-weight: 800; color: var(--navy); line-height: 1.3; }
+  .opts { display: grid; gap: 12px; }
+  .opts button {
+    font-family: inherit; font-size: 18px; text-align: left; line-height: 1.4;
+    padding: 14px 18px; border-radius: 14px; border: 2px solid var(--line);
+    background: var(--cream); color: var(--ink); cursor: pointer; transition: all .2s;
+  }
+  .opts button:hover:not(:disabled) { border-color: var(--sage); background: #EEF6F1; }
+  .opts button.correct { background: var(--ok-bg); border-color: #4E9A6A; font-weight: 700; }
+  .opts button.wrong { background: var(--bad-bg); border-color: var(--coral); }
+  .opts button:disabled { cursor: default; }
+
+  .result { display: grid; grid-template-rows: minmax(0, 1fr) auto auto; gap: 16px; min-height: 0; }
+  .placeholder {
+    background: var(--white); border: 3px dashed var(--line); border-radius: 22px;
+    display: grid; place-items: center; text-align: center; padding: 24px;
+    color: var(--muted); font-size: 20px; font-weight: 600;
+  }
+  #resultImg { width: 100%; height: 100%; min-height: 0; object-fit: contain; border-radius: 22px; background: var(--white); box-shadow: 0 12px 28px rgba(30,58,76,.14); }
+  .feedback { font-size: 20px; font-weight: 700; padding: 14px 18px; border-radius: 14px; line-height: 1.45; }
+  .feedback.ok { background: var(--ok-bg); color: var(--ok-text); }
+  .feedback.bad { background: var(--bad-bg); color: var(--bad-text); }
+  .actions { display: flex; gap: 12px; justify-content: flex-end; }
+  .actions button { font-family: inherit; font-size: 17px; font-weight: 700; padding: 12px 22px; border-radius: 999px; border: none; cursor: pointer; }
+  #retry { background: var(--white); color: var(--navy); border: 2px solid var(--navy); }
+  #retry:hover { background: var(--navy); color: var(--white); }
+  #nextQ { background: var(--coral); color: var(--white); }
+  #nextQ:hover { filter: brightness(.95); }
+
+  .final-card { grid-column: 1 / -1; background: var(--white); border-radius: 26px; padding: 48px; display: grid; place-items: center; text-align: center; gap: 14px; box-shadow: 0 10px 28px rgba(30,58,76,.1); }
+  .final-card .big { font-size: 96px; font-weight: 800; color: var(--coral); line-height: 1; }
+  .final-card p { font-size: 22px; color: var(--muted); }
+  .final-card button { font-family: inherit; font-size: 18px; font-weight: 700; padding: 12px 26px; border-radius: 999px; border: none; background: var(--navy); color: var(--white); cursor: pointer; margin-top: 8px; }
+
+  /* Pháo giấy */
   .confetti { position: fixed; width: 10px; height: 14px; border-radius: 2px; pointer-events: none; z-index: 40; animation: burst 1.2s ease-out forwards; }
   @keyframes burst {
     0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
@@ -118,19 +155,12 @@
   .nav button { font-family: inherit; font-size: 16px; font-weight: 700; padding: 10px 20px; border-radius: 999px; border: none; background: var(--coral); color: var(--white); cursor: pointer; }
   .nav button:disabled { opacity: .35; cursor: default; }
   .counter { color: var(--white); font-weight: 600; min-width: 60px; text-align: center; font-size: 16px; }
+  body.on-quiz .nav { display: none; }
 
   /* Falling petals */
   .petals { position: fixed; inset: 0; pointer-events: none; overflow: hidden; z-index: 15; }
-  .petal {
-    position: absolute; top: -40px;
-    border-radius: 0 100% 0 100%;
-    opacity: .85;
-    animation: fall linear infinite, sway ease-in-out infinite;
-  }
-  @keyframes fall {
-    from { top: -40px; }
-    to { top: 110vh; }
-  }
+  .petal { position: absolute; top: -40px; border-radius: 0 100% 0 100%; opacity: .85; animation: fall linear infinite, sway ease-in-out infinite; }
+  @keyframes fall { from { top: -40px; } to { top: 110vh; } }
   @keyframes sway {
     0%, 100% { transform: translateX(-30px) rotate(0deg); }
     50% { transform: translateX(30px) rotate(180deg); }
@@ -138,9 +168,9 @@
 
   @media (max-width: 900px) {
     .slide { padding: 48px 24px 120px; }
-    .body { grid-template-columns: 1fr; }
+    .body, .quiz-body { grid-template-columns: 1fr; }
     .hero-photos { display: none; }
-    .quiz-opts { grid-template-columns: 1fr; }
+    .opts { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -149,7 +179,7 @@
 <div class="progress" id="progress"></div>
 <div class="petals" id="petals"></div>
 
-<!-- Slide 1: Cover (images 1, 2) -->
+<!-- Slide 1: Cover -->
 <section class="slide hero active">
   <img class="hero-bg" src="1.jfif" alt="Volunteers smiling together">
   <div class="hero-shade"></div>
@@ -163,7 +193,7 @@
   </div>
 </section>
 
-<!-- Slide 2: Definition (images 3, 4) -->
+<!-- Slide 2 -->
 <section class="slide">
   <div class="header">
     <span class="tag">01 · DEFINITION</span>
@@ -181,7 +211,7 @@
   </div>
 </section>
 
-<!-- Slide 3: Ways to help (images 5, 6) -->
+<!-- Slide 3 -->
 <section class="slide">
   <div class="header">
     <span class="tag">02 · ACTIVITIES</span>
@@ -203,7 +233,7 @@
   </div>
 </section>
 
-<!-- Slide 4: Nursing home (images 7, 8) -->
+<!-- Slide 4 -->
 <section class="slide">
   <div class="header">
     <span class="tag">03 · NURSING HOME</span>
@@ -225,7 +255,7 @@
   </div>
 </section>
 
-<!-- Slide 5: Good volunteer (images 9, 10) -->
+<!-- Slide 5 -->
 <section class="slide">
   <div class="header">
     <span class="tag">04 · GOOD MANNERS</span>
@@ -247,7 +277,7 @@
   </div>
 </section>
 
-<!-- Slide 6: Benefits (images 11, 12) -->
+<!-- Slide 6 -->
 <section class="slide">
   <div class="header">
     <span class="tag">05 · BENEFITS</span>
@@ -280,26 +310,54 @@
 </section>
 
 <!-- Slide 8: Quiz -->
-<section class="slide">
+<section class="slide quiz-slide" id="quizSlide">
   <div class="header">
-    <span class="tag">07 · QUIZ</span>
+    <div class="quiz-top">
+      <span class="tag">07 · QUIZ</span>
+      <button class="back-slide" id="backSlide">← Slide trước</button>
+    </div>
     <h2>Test your knowledge</h2>
   </div>
-  <div class="body" style="display:flex; flex-direction:column; min-height:0;">
-    <div class="quiz" id="quiz"></div>
-    <p class="score" id="score"></p>
+  <div class="body quiz-body">
+    <div class="q-card" id="qCard">
+      <div class="q-meta">
+        <span class="q-label" id="qLabel"></span>
+        <div class="q-bar"><div id="qBar"></div></div>
+      </div>
+      <div class="q-text" id="qText"></div>
+      <div class="opts" id="opts"></div>
+    </div>
+
+    <div class="result" id="resultArea">
+      <div class="placeholder" id="placeholder">Choose an answer to see the result</div>
+      <img id="resultImg" alt="">
+      <div class="feedback" id="feedback" hidden></div>
+      <div class="actions" id="actions" hidden>
+        <button id="retry">Quay lại</button>
+        <button id="nextQ">Câu tiếp theo →</button>
+      </div>
+    </div>
+
+    <div class="final-card" id="finalCard" hidden>
+      <h3>Quiz finished!</h3>
+      <div class="big" id="bigScore"></div>
+      <p id="finalMsg"></p>
+      <button id="restart">Làm lại từ đầu</button>
+    </div>
   </div>
 </section>
 
-<div class="nav">
+<div class="nav" id="nav">
   <button id="prev">← Back</button>
   <span class="counter" id="counter">1 / 8</span>
   <button id="next">Next →</button>
 </div>
 
 <script>
+  // ===== Slide navigation =====
   const slides = document.querySelectorAll('.slide');
   const progress = document.getElementById('progress');
+  const QUIZ_INDEX = slides.length - 1;
   let current = 0;
 
   function show(i) {
@@ -307,6 +365,7 @@
       s.classList.toggle('active', idx === i);
       if (idx !== i) s.querySelectorAll('video').forEach(v => v.pause());
     });
+    document.body.classList.toggle('on-quiz', i === QUIZ_INDEX);
     document.getElementById('counter').textContent = (i + 1) + ' / ' + slides.length;
     document.getElementById('prev').disabled = i === 0;
     document.getElementById('next').disabled = i === slides.length - 1;
@@ -318,13 +377,15 @@
 
   document.getElementById('next').onclick = next;
   document.getElementById('prev').onclick = prev;
+  document.getElementById('backSlide').onclick = () => show(QUIZ_INDEX - 1);
   document.addEventListener('keydown', e => {
     if (e.target.tagName === 'VIDEO') return;
+    if (current === QUIZ_INDEX) return;
     if (e.key === 'ArrowRight') next();
     if (e.key === 'ArrowLeft') prev();
   });
 
-  // Falling petals: 37 petals, 7 colors
+  // ===== Falling petals: 37 petals, 7 colors =====
   (function () {
     const layer = document.getElementById('petals');
     const palette = [
@@ -336,8 +397,7 @@
       { light: '#F1E8FF', main: '#C9ADEB', dark: '#A88BD6' },
       { light: '#FFE0E0', main: '#F08A8A', dark: '#D96767' }
     ];
-    const total = 37;
-    for (let i = 0; i < total; i++) {
+    for (let i = 0; i < 37; i++) {
       const c = palette[i % palette.length];
       const p = document.createElement('div');
       p.className = 'petal';
@@ -352,7 +412,7 @@
     }
   })();
 
-  // Pháo giấy
+  // ===== Confetti =====
   function confettiBurst(x, y) {
     const colors = ['#E07A5F', '#81B29A', '#F6D978', '#A8C8F0', '#F8B4C8', '#C9ADEB', '#6DBA80'];
     for (let i = 0; i < 40; i++) {
@@ -370,57 +430,193 @@
     }
   }
 
-  // Quiz
+  // ===== Quiz =====
+  // Ảnh trên GitHub: dung.1.jpg ... dung.10.jpg (đáp án đúng), sai.1.jpg ... sai.10.jpg (đáp án sai)
+  // Nếu file của bạn không có đuôi .jpg, đổi EXT cho khớp (ví dụ '' nếu không có đuôi)
+  const EXT = '.jpg';
+
+  // a = chỉ số (0 = A, 1 = B, 2 = C, 3 = D) của đáp án đúng
   const questions = [
-    { q: '1. What is volunteering?',
+    { q: 'What is volunteering?',
       opts: ['Working for money', 'Giving time and effort to help others without expecting money', 'Studying at school', 'Selling goods in a market'],
       a: 1 },
-    { q: '2. Which activity is a good way to help older people at a nursing home?',
+    { q: 'Which activity is a good way to help older people at a nursing home?',
       opts: ['Playing games and chatting with them', 'Shouting at them', 'Taking photos of them without permission', 'Ignoring them'],
       a: 0 },
-    { q: '3. What should a good volunteer do first when visiting a nursing home?',
-      opts: ['Change the rules of the facility', 'Ask staff what they are allowed to do', 'Bring pets without asking', 'Leave early without telling anyone'],
-      a: 1 }
+    { q: 'What should a good volunteer do first when visiting a nursing home?',
+      opts: ['Change the rules of the facility', 'Bring pets without asking', 'Ask staff what they are allowed to do', 'Leave early without telling anyone'],
+      a: 2 },
+    { q: 'Which place is a nursing home?',
+      opts: ['A school for children', 'A place where older people live and receive daily care', 'A hospital for surgery only', 'A shopping center'],
+      a: 1 },
+    { q: 'Why do many nursing home residents feel lonely?',
+      opts: ['They have too many visitors', 'They do not like music', 'They live in very small rooms', 'Their families cannot visit them often'],
+      a: 3 },
+    { q: 'Which activity is suitable for volunteers at a nursing home?',
+      opts: ['Gardening together', 'Pushing residents to run a race', 'Giving medicine without a doctor\'s order', 'Leaving residents alone all day'],
+      a: 0 },
+    { q: 'Why should volunteers keep their promises and arrive on time?',
+      opts: ['Because it makes the building look nicer', 'Because the staff will pay them more', 'Because residents may be waiting and feel disappointed', 'Because it is not important'],
+      a: 2 },
+    { q: 'Which of these is a way to help people in the community?',
+      opts: ['Cleaning up a park', 'Breaking public benches', 'Throwing trash on the street', 'Ignoring people in need'],
+      a: 0 },
+    { q: 'What does "volunteer" mean?',
+      opts: ['A person who works for a high salary', 'A person who helps others without expecting money', 'A person who manages a company', 'A person who only studies at home'],
+      a: 1 },
+    { q: 'What is one benefit of volunteering for older people?',
+      opts: ['They feel more lonely', 'They lose their friends', 'They have to work more', 'They feel less lonely and more connected'],
+      a: 3 }
   ];
 
-  const quizEl = document.getElementById('quiz');
-  let score = 0, answered = 0;
+  const TOTAL = questions.length;
+  let qi = 0;
+  let score = 0;
 
-  questions.forEach(item => {
-    const box = document.createElement('div');
-    box.className = 'quiz-q';
-    const title = document.createElement('h3');
-    title.textContent = item.q;
-    const grid = document.createElement('div');
-    grid.className = 'quiz-opts';
-    box.appendChild(title);
-    box.appendChild(grid);
+  const el = {
+    label: document.getElementById('qLabel'),
+    bar: document.getElementById('qBar'),
+    text: document.getElementById('qText'),
+    opts: document.getElementById('opts'),
+    placeholder: document.getElementById('placeholder'),
+    img: document.getElementById('resultImg'),
+    feedback: document.getElementById('feedback'),
+    actions: document.getElementById('actions'),
+    retry: document.getElementById('retry'),
+    nextQ: document.getElementById('nextQ'),
+    qCard: document.getElementById('qCard'),
+    resultArea: document.getElementById('resultArea'),
+    finalCard: document.getElementById('finalCard'),
+    bigScore: document.getElementById('bigScore'),
+    finalMsg: document.getElementById('finalMsg')
+  };
+
+  // Mỗi câu lưu: firstTry (lần chọn đầu tiên đúng hay sai), locked (đã chọn đúng hay chưa), chosen (lựa chọn gần nhất)
+  const state = questions.map(() => ({ firstTry: null, locked: false }));
+
+  function renderQuestion() {
+    const item = questions[qi];
+    const st = state[qi];
+    el.label.textContent = 'Question ' + (qi + 1) + ' / ' + TOTAL;
+    el.bar.style.width = (qi / TOTAL * 100) + '%';
+    el.text.textContent = (qi + 1) + '. ' + item.q;
+    el.opts.innerHTML = '';
 
     item.opts.forEach((text, oi) => {
       const btn = document.createElement('button');
       btn.textContent = String.fromCharCode(65 + oi) + '. ' + text;
-      btn.onclick = () => {
-        const buttons = grid.querySelectorAll('button');
-        buttons.forEach(b => b.disabled = true);
-        if (oi === item.a) {
-          btn.classList.add('correct');
-          score++;
-          const r = btn.getBoundingClientRect();
-          confettiBurst(r.left + r.width / 2, r.top + r.height / 2);
-        } else {
-          btn.classList.add('wrong');
-          buttons[item.a].classList.add('correct');
-        }
-        answered++;
-        if (answered === questions.length) {
-          document.getElementById('score').textContent = 'Your score: ' + score + ' / ' + questions.length;
-        }
-      };
-      grid.appendChild(btn);
+      btn.onclick = () => choose(oi);
+      el.opts.appendChild(btn);
     });
-    quizEl.appendChild(box);
-  });
 
+    // Nếu câu này đã được chọn trước đó, khôi phục trạng thái
+    el.placeholder.hidden = false;
+    el.img.hidden = true;
+    el.feedback.hidden = true;
+    el.actions.hidden = true;
+    el.retry.hidden = true;
+    el.nextQ.hidden = true;
+    if (st.locked) showResult(st.lastChoice, true);
+  }
+
+  function choose(oi) {
+    const item = questions[qi];
+    const st = state[qi];
+    if (st.locked) return;
+
+    const buttons = el.opts.querySelectorAll('button');
+    const isCorrect = oi === item.a;
+    if (st.firstTry === null) {
+      st.firstTry = isCorrect ? 'correct' : 'wrong';
+      if (isCorrect) score++;
+    }
+    st.lastChoice = oi;
+    buttons.forEach(b => b.disabled = true);
+    showResult(oi, false);
+
+    if (isCorrect) {
+      st.locked = true;
+      buttons[oi].classList.add('correct');
+      const r = buttons[oi].getBoundingClientRect();
+      confettiBurst(r.left + r.width / 2, r.top + r.height / 2);
+    } else {
+      buttons[oi].classList.add('wrong');
+      buttons[item.a].classList.add('correct');
+    }
+  }
+
+  function showResult(oi, restored) {
+    const item = questions[qi];
+    const st = state[qi];
+    const isCorrect = oi === item.a;
+    const buttons = el.opts.querySelectorAll('button');
+
+    el.placeholder.hidden = true;
+    el.img.hidden = false;
+    el.img.src = (isCorrect ? 'dung.' : 'sai.') + (qi + 1) + EXT;
+    el.img.alt = isCorrect ? 'Correct answer' : 'Wrong answer';
+
+    el.feedback.hidden = false;
+    el.feedback.className = 'feedback ' + (isCorrect ? 'ok' : 'bad');
+    el.feedback.textContent = isCorrect
+      ? 'Correct! ' + item.opts[item.a]
+      : 'Not quite. The correct answer is: ' + item.opts[item.a];
+
+    el.actions.hidden = false;
+    el.retry.hidden = isCorrect;   // Đúng thì không cần làm lại
+    el.nextQ.hidden = false;
+
+    if (restored) {
+      buttons.forEach(b => b.disabled = true);
+      buttons[item.a].classList.add('correct');
+      if (!isCorrect) buttons[oi].classList.add('wrong');
+    }
+  }
+
+  function retry() {
+    // Làm lại câu này: bỏ trạng thái sai để chọn lại
+    const st = state[qi];
+    st.locked = false;
+    st.lastChoice = undefined;
+    renderQuestion();
+  }
+
+  function nextQuestion() {
+    if (qi < TOTAL - 1) {
+      qi++;
+      renderQuestion();
+    } else {
+      showFinal();
+    }
+  }
+
+  function showFinal() {
+    el.qCard.hidden = true;
+    el.resultArea.hidden = true;
+    el.finalCard.hidden = false;
+    el.bigScore.textContent = score + ' / ' + TOTAL;
+    el.finalMsg.textContent = score >= 8
+      ? 'Great job! You understand the topic very well.'
+      : 'Good effort! Try again to improve your score.';
+    el.bar.style.width = '100%';
+    el.label.textContent = 'Completed';
+  }
+
+  function restartQuiz() {
+    qi = 0;
+    score = 0;
+    state.forEach(s => { s.firstTry = null; s.locked = false; s.lastChoice = undefined; });
+    el.qCard.hidden = false;
+    el.resultArea.hidden = false;
+    el.finalCard.hidden = true;
+    renderQuestion();
+  }
+
+  el.retry.onclick = retry;
+  el.nextQ.onclick = nextQuestion;
+  document.getElementById('restart').onclick = restartQuiz;
+
+  renderQuestion();
   show(0);
 </script>
 </body>
