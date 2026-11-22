@@ -139,11 +139,12 @@
   #nextQ:hover { filter: brightness(.95); }
 
   .final-card { grid-column: 1 / -1; background: var(--white); border-radius: 26px; padding: 48px; display: grid; place-items: center; text-align: center; gap: 14px; box-shadow: 0 10px 28px rgba(30,58,76,.1); }
+  .final-card h3 { font-size: 34px; }
   .final-card .big { font-size: 96px; font-weight: 800; color: var(--coral); line-height: 1; }
   .final-card p { font-size: 22px; color: var(--muted); }
   .final-card button { font-family: inherit; font-size: 18px; font-weight: 700; padding: 12px 26px; border-radius: 999px; border: none; background: var(--navy); color: var(--white); cursor: pointer; margin-top: 8px; }
 
-  /* Pháo giấy */
+  /* Confetti */
   .confetti { position: fixed; width: 10px; height: 14px; border-radius: 2px; pointer-events: none; z-index: 40; animation: burst 1.2s ease-out forwards; }
   @keyframes burst {
     0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
@@ -329,7 +330,7 @@
     </div>
 
     <div class="result" id="resultArea">
-      <div class="placeholder" id="placeholder">Choose an answer to see the result</div>
+      <div class="placeholder" id="placeholder">Chọn một đáp án để xem kết quả</div>
       <img id="resultImg" alt="">
       <div class="feedback" id="feedback" hidden></div>
       <div class="actions" id="actions" hidden>
@@ -339,7 +340,7 @@
     </div>
 
     <div class="final-card" id="finalCard" hidden>
-      <h3>Quiz finished!</h3>
+      <h3>Hết bài rồi!</h3>
       <div class="big" id="bigScore"></div>
       <p id="finalMsg"></p>
       <button id="restart">Làm lại từ đầu</button>
@@ -431,11 +432,11 @@
   }
 
   // ===== Quiz =====
-  // Ảnh trên GitHub: dung.1.jpg ... dung.10.jpg (đáp án đúng), sai.1.jpg ... sai.10.jpg (đáp án sai)
-  // Nếu file của bạn không có đuôi .jpg, đổi EXT cho khớp (ví dụ '' nếu không có đuôi)
+  // Ảnh trên GitHub: dung.1.jpg ... dung.10.jpg và sai.1.jpg ... sai.10.jpg
+  // Nếu file không có đuôi .jpg thì đổi EXT thành ''
   const EXT = '.jpg';
 
-  // a = chỉ số (0 = A, 1 = B, 2 = C, 3 = D) của đáp án đúng
+  // a = vị trí đáp án đúng (0 = A, 1 = B, 2 = C, 3 = D)
   const questions = [
     { q: 'What is volunteering?',
       opts: ['Working for money', 'Giving time and effort to help others without expecting money', 'Studying at school', 'Selling goods in a market'],
@@ -472,6 +473,8 @@
   const TOTAL = questions.length;
   let qi = 0;
   let score = 0;
+  // firstTry: lần chọn đầu đúng/sai (để tính điểm); locked: đã trả lời đúng; lastChoice: đáp án đã chọn đúng
+  const state = questions.map(() => ({ firstTry: null, locked: false, lastChoice: null }));
 
   const el = {
     label: document.getElementById('qLabel'),
@@ -491,8 +494,14 @@
     finalMsg: document.getElementById('finalMsg')
   };
 
-  // Mỗi câu lưu: firstTry (lần chọn đầu tiên đúng hay sai), locked (đã chọn đúng hay chưa), chosen (lựa chọn gần nhất)
-  const state = questions.map(() => ({ firstTry: null, locked: false }));
+  function resetResultPanel() {
+    el.placeholder.hidden = false;
+    el.img.hidden = true;
+    el.feedback.hidden = true;
+    el.actions.hidden = true;
+    el.retry.hidden = true;
+    el.nextQ.hidden = true;
+  }
 
   function renderQuestion() {
     const item = questions[qi];
@@ -501,6 +510,7 @@
     el.bar.style.width = (qi / TOTAL * 100) + '%';
     el.text.textContent = (qi + 1) + '. ' + item.q;
     el.opts.innerHTML = '';
+    resetResultPanel();
 
     item.opts.forEach((text, oi) => {
       const btn = document.createElement('button');
@@ -509,14 +519,13 @@
       el.opts.appendChild(btn);
     });
 
-    // Nếu câu này đã được chọn trước đó, khôi phục trạng thái
-    el.placeholder.hidden = false;
-    el.img.hidden = true;
-    el.feedback.hidden = true;
-    el.actions.hidden = true;
-    el.retry.hidden = true;
-    el.nextQ.hidden = true;
-    if (st.locked) showResult(st.lastChoice, true);
+    // Câu đã trả lời đúng: hiện lại kết quả đúng
+    if (st.locked) {
+      const buttons = el.opts.querySelectorAll('button');
+      buttons.forEach(b => b.disabled = true);
+      buttons[st.lastChoice].classList.add('correct');
+      showResult(true);
+    }
   }
 
   function choose(oi) {
@@ -524,33 +533,30 @@
     const st = state[qi];
     if (st.locked) return;
 
-    const buttons = el.opts.querySelectorAll('button');
     const isCorrect = oi === item.a;
     if (st.firstTry === null) {
       st.firstTry = isCorrect ? 'correct' : 'wrong';
       if (isCorrect) score++;
     }
     st.lastChoice = oi;
-    buttons.forEach(b => b.disabled = true);
-    showResult(oi, false);
 
+    const buttons = el.opts.querySelectorAll('button');
     if (isCorrect) {
       st.locked = true;
+      buttons.forEach(b => b.disabled = true);
       buttons[oi].classList.add('correct');
       const r = buttons[oi].getBoundingClientRect();
       confettiBurst(r.left + r.width / 2, r.top + r.height / 2);
+      showResult(true);
     } else {
+      // Sai: chỉ khóa đáp án vừa chọn, không tiết lộ đáp án đúng
       buttons[oi].classList.add('wrong');
-      buttons[item.a].classList.add('correct');
+      buttons[oi].disabled = true;
+      showResult(false);
     }
   }
 
-  function showResult(oi, restored) {
-    const item = questions[qi];
-    const st = state[qi];
-    const isCorrect = oi === item.a;
-    const buttons = el.opts.querySelectorAll('button');
-
+  function showResult(isCorrect) {
     el.placeholder.hidden = true;
     el.img.hidden = false;
     el.img.src = (isCorrect ? 'dung.' : 'sai.') + (qi + 1) + EXT;
@@ -559,25 +565,20 @@
     el.feedback.hidden = false;
     el.feedback.className = 'feedback ' + (isCorrect ? 'ok' : 'bad');
     el.feedback.textContent = isCorrect
-      ? 'Correct! ' + item.opts[item.a]
-      : 'Not quite. The correct answer is: ' + item.opts[item.a];
+      ? 'Chính xác! Làm tốt lắm.'
+      : 'Chưa đúng. Thử lại nhé!';
 
     el.actions.hidden = false;
-    el.retry.hidden = isCorrect;   // Đúng thì không cần làm lại
-    el.nextQ.hidden = false;
-
-    if (restored) {
-      buttons.forEach(b => b.disabled = true);
-      buttons[item.a].classList.add('correct');
-      if (!isCorrect) buttons[oi].classList.add('wrong');
-    }
+    el.retry.hidden = isCorrect;    // sai: hiện Quay lại
+    el.nextQ.hidden = !isCorrect;   // đúng: hiện nút tiếp theo
+    el.nextQ.textContent = qi === TOTAL - 1 ? 'Xem kết quả →' : 'Câu tiếp theo →';
   }
 
   function retry() {
-    // Làm lại câu này: bỏ trạng thái sai để chọn lại
+    // Cho chọn lại câu này từ đầu
     const st = state[qi];
     st.locked = false;
-    st.lastChoice = undefined;
+    st.lastChoice = null;
     renderQuestion();
   }
 
@@ -594,18 +595,21 @@
     el.qCard.hidden = true;
     el.resultArea.hidden = true;
     el.finalCard.hidden = false;
-    el.bigScore.textContent = score + ' / ' + TOTAL;
-    el.finalMsg.textContent = score >= 8
-      ? 'Great job! You understand the topic very well.'
-      : 'Good effort! Try again to improve your score.';
     el.bar.style.width = '100%';
-    el.label.textContent = 'Completed';
+    el.label.textContent = 'Hoàn thành';
+    el.bigScore.textContent = score + ' / ' + TOTAL;
+    const pct = score / TOTAL;
+    el.finalMsg.textContent = pct >= 0.8
+      ? 'Xuất sắc! Bạn đã nắm rất tốt nội dung bài.'
+      : pct >= 0.5
+        ? 'Khá tốt! Hãy xem lại các câu sai để nhớ lâu hơn.'
+        : 'Cố lên! Bạn có thể làm lại để cải thiện điểm.';
   }
 
   function restartQuiz() {
     qi = 0;
     score = 0;
-    state.forEach(s => { s.firstTry = null; s.locked = false; s.lastChoice = undefined; });
+    state.forEach(s => { s.firstTry = null; s.locked = false; s.lastChoice = null; });
     el.qCard.hidden = false;
     el.resultArea.hidden = false;
     el.finalCard.hidden = true;
