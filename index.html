@@ -33,6 +33,18 @@
   .slide.active { display: grid; animation: rise .5s ease; }
   @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 
+  /* Chữ trượt lên khi vào slide */
+  .slide.active .tag { animation: reveal .7s ease both; }
+  .slide.active h2 { animation: reveal .8s .12s ease both; }
+  .slide.active .text > *, .slide.active .text li { animation: reveal .8s .25s ease both; }
+  .slide.active .text li:nth-child(2) { animation-delay: .35s; }
+  .slide.active .text li:nth-child(3) { animation-delay: .45s; }
+  .slide.active .text li:nth-child(4) { animation-delay: .55s; }
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: none; }
+  }
+
   .tag {
     display: inline-block; justify-self: start;
     background: var(--sage); color: var(--white);
@@ -53,18 +65,30 @@
   .text li::before { content: ""; position: absolute; left: 0; top: .5em; width: 12px; height: 12px; border-radius: 50%; background: var(--coral); }
 
   .photos { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; min-height: 0; }
-  .photos img { width: 100%; height: 100%; min-height: 0; object-fit: cover; border-radius: 22px; box-shadow: 0 14px 30px rgba(30,58,76,.16); }
+  .photos img {
+    width: 100%; height: 100%; min-height: 0; object-fit: cover; border-radius: 22px;
+    box-shadow: 0 14px 30px rgba(30,58,76,.16);
+    animation: kenburns 18s ease-in-out infinite alternate;
+  }
+  /* Ảnh phóng to chậm và trôi nhẹ */
+  @keyframes kenburns {
+    from { transform: scale(1) translate(0, 0); }
+    to { transform: scale(1.08) translate(-1.5%, -1%); }
+  }
 
   /* Slide 1: cover */
   .hero { padding: 0; }
-  .hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero-bg {
+    position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
+    animation: kenburns 25s ease-in-out infinite alternate;
+  }
   .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(30,58,76,.94) 0%, rgba(30,58,76,.72) 50%, rgba(30,58,76,.25) 100%); }
   .hero-text { position: relative; align-self: end; max-width: 760px; color: var(--white); padding-bottom: 40px; }
   .hero-text .tag { background: var(--coral); }
   .hero h1 { font-size: clamp(44px, 6vw, 84px); font-weight: 800; line-height: 1.06; margin-bottom: 20px; }
   .hero p { font-size: clamp(18px, 1.8vw, 26px); color: #DDE7EC; }
   .hero-photos { position: absolute; right: 80px; top: 60px; bottom: 150px; width: 34%; display: grid; grid-template-rows: 1fr; }
-  .hero-photos img { width: 100%; height: 100%; object-fit: cover; border-radius: 24px; box-shadow: 0 18px 40px rgba(0,0,0,.3); border: 6px solid rgba(255,255,255,.9); }
+  .hero-photos img { width: 100%; height: 100%; object-fit: cover; border-radius: 24px; box-shadow: 0 18px 40px rgba(0,0,0,.3); border: 6px solid rgba(255,255,255,.9); animation: kenburns 20s ease-in-out infinite alternate; }
 
   /* Slide 7: video */
   .video-body { place-items: center; display: grid; }
@@ -81,6 +105,13 @@
   .quiz-opts button.wrong { background: #F9E1DB; border-color: var(--coral); }
   .quiz-opts button:disabled { cursor: default; }
   .score { font-size: 24px; font-weight: 800; color: var(--coral); min-height: 34px; margin-top: 10px; }
+
+  /* Pháo giấy khi trả lời đúng */
+  .confetti { position: fixed; width: 10px; height: 14px; border-radius: 2px; pointer-events: none; z-index: 40; animation: burst 1.2s ease-out forwards; }
+  @keyframes burst {
+    0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) rotate(540deg); opacity: 0; }
+  }
 
   /* Navigation */
   .nav { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 16px; z-index: 20; background: rgba(30,58,76,.88); padding: 8px 10px; border-radius: 999px; }
@@ -297,13 +328,13 @@
   (function () {
     const layer = document.getElementById('petals');
     const palette = [
-      { light: '#FFF0F5', main: '#F8B4C8', dark: '#E88BA6' }, // pale pink
-      { light: '#FFE4D6', main: '#F9B98F', dark: '#E8956A' }, // peach
-      { light: '#FFF6DB', main: '#F6D978', dark: '#E0B94E' }, // yellow
-      { light: '#E6F5E8', main: '#9ED9A8', dark: '#6DBA80' }, // mint green
-      { light: '#E8F1FF', main: '#A8C8F0', dark: '#7BA7DB' }, // sky blue
-      { light: '#F1E8FF', main: '#C9ADEB', dark: '#A88BD6' }, // lavender
-      { light: '#FFE0E0', main: '#F08A8A', dark: '#D96767' }  // soft red
+      { light: '#FFF0F5', main: '#F8B4C8', dark: '#E88BA6' },
+      { light: '#FFE4D6', main: '#F9B98F', dark: '#E8956A' },
+      { light: '#FFF6DB', main: '#F6D978', dark: '#E0B94E' },
+      { light: '#E6F5E8', main: '#9ED9A8', dark: '#6DBA80' },
+      { light: '#E8F1FF', main: '#A8C8F0', dark: '#7BA7DB' },
+      { light: '#F1E8FF', main: '#C9ADEB', dark: '#A88BD6' },
+      { light: '#FFE0E0', main: '#F08A8A', dark: '#D96767' }
     ];
     const total = 37;
     for (let i = 0; i < total; i++) {
@@ -320,6 +351,24 @@
       layer.appendChild(p);
     }
   })();
+
+  // Pháo giấy
+  function confettiBurst(x, y) {
+    const colors = ['#E07A5F', '#81B29A', '#F6D978', '#A8C8F0', '#F8B4C8', '#C9ADEB', '#6DBA80'];
+    for (let i = 0; i < 40; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.left = x + 'px';
+      c.style.top = y + 'px';
+      c.style.background = colors[i % colors.length];
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 120 + Math.random() * 180;
+      c.style.setProperty('--dx', Math.cos(angle) * dist + 'px');
+      c.style.setProperty('--dy', Math.sin(angle) * dist + 'px');
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 1300);
+    }
+  }
 
   // Quiz
   const questions = [
@@ -353,8 +402,15 @@
       btn.onclick = () => {
         const buttons = grid.querySelectorAll('button');
         buttons.forEach(b => b.disabled = true);
-        if (oi === item.a) { btn.classList.add('correct'); score++; }
-        else { btn.classList.add('wrong'); buttons[item.a].classList.add('correct'); }
+        if (oi === item.a) {
+          btn.classList.add('correct');
+          score++;
+          const r = btn.getBoundingClientRect();
+          confettiBurst(r.left + r.width / 2, r.top + r.height / 2);
+        } else {
+          btn.classList.add('wrong');
+          buttons[item.a].classList.add('correct');
+        }
         answered++;
         if (answered === questions.length) {
           document.getElementById('score').textContent = 'Your score: ' + score + ' / ' + questions.length;
