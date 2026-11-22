@@ -46,9 +46,21 @@
     background: transparent;
     z-index: 2;
   }
-  .slide.active { display: grid; animation: rise .5s ease; }
-  @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+  .slide.active { display: grid; }
 
+  /* Chuyển slide trượt ngang */
+  .slide.from-right.active { animation: inRight .55s ease both; }
+  .slide.from-left.active { animation: inLeft .55s ease both; }
+  @keyframes inRight {
+    from { opacity: 0; transform: translateX(90px); }
+    to { opacity: 1; transform: none; }
+  }
+  @keyframes inLeft {
+    from { opacity: 0; transform: translateX(-90px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  /* Chữ hiện dần sau khi slide vào */
   .slide.active .tag { animation: reveal .7s ease both; }
   .slide.active h2 { animation: reveal .8s .12s ease both; }
   .slide.active .text > *, .slide.active .text li { animation: reveal .8s .25s ease both; }
@@ -79,15 +91,14 @@
   .text li { position: relative; padding-left: 30px; font-size: clamp(17px, 1.5vw, 21px); line-height: 1.5; }
   .text li::before { content: ""; position: absolute; left: 0; top: .5em; width: 12px; height: 12px; border-radius: 50%; background: var(--coral); }
 
+  /* Ảnh nghiêng 3D theo chuột */
   .photos { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; min-height: 0; }
-  .photos img {
+  .photos img, .hero-photos img {
     width: 100%; height: 100%; min-height: 0; object-fit: cover; border-radius: 22px;
     box-shadow: 0 14px 30px rgba(30,58,76,.16);
-    animation: kenburns 18s ease-in-out infinite alternate;
-  }
-  @keyframes kenburns {
-    from { transform: scale(1) translate(0, 0); }
-    to { transform: scale(1.08) translate(-1.5%, -1%); }
+    transition: transform .35s ease, box-shadow .35s ease;
+    will-change: transform;
+    cursor: pointer;
   }
 
   /* Slide 1: cover */
@@ -96,13 +107,17 @@
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;
     animation: kenburns 25s ease-in-out infinite alternate;
   }
+  @keyframes kenburns {
+    from { transform: scale(1) translate(0, 0); }
+    to { transform: scale(1.08) translate(-1.5%, -1%); }
+  }
   .hero-shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(30,58,76,.94) 0%, rgba(30,58,76,.72) 50%, rgba(30,58,76,.25) 100%); }
   .hero-text { position: relative; align-self: end; max-width: 760px; color: var(--white); padding-bottom: 40px; }
   .hero-text .tag { background: var(--coral); }
   .hero h1 { font-size: clamp(44px, 6vw, 84px); font-weight: 800; line-height: 1.06; margin-bottom: 20px; }
   .hero p { font-size: clamp(18px, 1.8vw, 26px); color: #DDE7EC; }
   .hero-photos { position: absolute; right: 80px; top: 60px; bottom: 150px; width: 34%; display: grid; grid-template-rows: 1fr; }
-  .hero-photos img { width: 100%; height: 100%; object-fit: cover; border-radius: 24px; box-shadow: 0 18px 40px rgba(0,0,0,.3); border: 6px solid rgba(255,255,255,.9); animation: kenburns 20s ease-in-out infinite alternate; }
+  .hero-photos img { border: 6px solid rgba(255,255,255,.9); box-shadow: 0 18px 40px rgba(0,0,0,.3); }
 
   /* Slide 7: video */
   .video-body { place-items: center; display: grid; }
@@ -359,17 +374,21 @@
 </div>
 
 <script>
-  // ===== Slide navigation =====
+  // ===== Slide navigation (trượt ngang) =====
   const slides = document.querySelectorAll('.slide');
   const progress = document.getElementById('progress');
   const QUIZ_INDEX = slides.length - 1;
   let current = 0;
 
-  function show(i) {
+  function show(i, dir) {
     slides.forEach((s, idx) => {
+      s.classList.remove('from-left', 'from-right');
       s.classList.toggle('active', idx === i);
       if (idx !== i) s.querySelectorAll('video').forEach(v => v.pause());
     });
+    if (dir && i !== current) {
+      slides[i].classList.add(dir === 'next' ? 'from-right' : 'from-left');
+    }
     document.body.classList.toggle('on-quiz', i === QUIZ_INDEX);
     document.getElementById('counter').textContent = (i + 1) + ' / ' + slides.length;
     document.getElementById('prev').disabled = i === 0;
@@ -377,17 +396,32 @@
     progress.style.width = ((i + 1) / slides.length * 100) + '%';
     current = i;
   }
-  function next() { if (current < slides.length - 1) show(current + 1); }
-  function prev() { if (current > 0) show(current - 1); }
+  function next() { if (current < slides.length - 1) show(current + 1, 'next'); }
+  function prev() { if (current > 0) show(current - 1, 'prev'); }
 
   document.getElementById('next').onclick = next;
   document.getElementById('prev').onclick = prev;
-  document.getElementById('backSlide').onclick = () => show(QUIZ_INDEX - 1);
+  document.getElementById('backSlide').onclick = () => show(QUIZ_INDEX - 1, 'prev');
   document.addEventListener('keydown', e => {
     if (e.target.tagName === 'VIDEO') return;
     if (current === QUIZ_INDEX) return;
     if (e.key === 'ArrowRight') next();
     if (e.key === 'ArrowLeft') prev();
+  });
+
+  // ===== Ảnh nghiêng 3D theo chuột =====
+  document.querySelectorAll('.photos img, .hero-photos img').forEach(img => {
+    img.addEventListener('mousemove', e => {
+      const r = img.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      img.style.transform = 'perspective(900px) rotateY(' + (x * 14) + 'deg) rotateX(' + (-y * 14) + 'deg) scale(1.04)';
+      img.style.boxShadow = (-x * 26) + 'px ' + (-y * 26 + 18) + 'px 40px rgba(30,58,76,.28)';
+    });
+    img.addEventListener('mouseleave', () => {
+      img.style.transform = '';
+      img.style.boxShadow = '';
+    });
   });
 
   // ===== Falling petals: 37 petals, 7 colors =====
